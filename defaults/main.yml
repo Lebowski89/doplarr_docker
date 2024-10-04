@@ -1,0 +1,73 @@
+---
+
+################################
+# BASICS
+################################
+
+doplarr_basics_name: 'doplarr'
+doplarr_basics_image_repo: 'ghcr.io/hotio/doplarr'
+doplarr_basics_image_tag: 'latest'
+doplarr_basics_restart_policy: 'unless-stopped'
+
+################################
+# NETWORK
+################################
+
+doplarr_network_backend: 'proxy'  ## allows backend docker communication between doplarr and radarr/sonarr
+doplarr_network_backend_driver: ''  ## only required if network doesn't exist
+doplarr_network_backend_subnet: ''  ## only required if network doesn't exist
+
+################################
+# ENV
+################################
+
+doplarr_env_timezone: ''
+doplarr_env_puid: ''
+doplarr_env_pgid: ''
+
+################################
+# PATHS
+################################
+
+doplarr_paths_folder: '{{ doplarr_basics_name }}'
+doplarr_paths_location: '/opt/{{ doplarr_paths_folder }}'
+
+################################
+# BINDS
+################################
+
+doplarr_bind_mount:
+  - '{{ doplarr_paths_location }}:/config'
+
+################################
+# LOGS
+################################
+
+doplarr_log_level: ':trace'  ## One of :trace :debug :info :warn :error :fatal :report
+
+################################
+# CLIENTS
+################################
+
+  ## discord
+doplarr_discord_token: ENTER_DISCORD_TOKEN_HERE  ## See Doplarr's documentation on how to generate the token.
+doplarr_discord_max_results: '25'  ## Sets the maximum size of the search results selection
+doplarr_discord_message_style: ':plain'  ## Sets the style of the request alert message. One of :plain :embed :none
+
+  ## radarr
+doplarr_radarr_name: 'radarr'
+doplarr_radarr_port: '7878'
+doplarr_radarr_host: 'http://{{ doplarr_radarr_name }}:{{ doplarr_radarr_port }}'
+doplarr_radarr_api: ''
+doplarr_radarr_quality_profile: ''
+doplarr_radarr_root_folder: ''
+
+  ## sonarr
+doplarr_sonarr_name: 'sonarr'
+doplarr_sonarr_port: '8989'
+doplarr_sonarr_host: 'http://{{ doplarr_sonarr_name }}:{{ doplarr_sonarr_port }}'
+doplarr_sonarr_api: ''
+doplarr_sonarr_quality_profile: ''
+doplarr_sonarr_root_folder: ''
+doplarr_sonarr_partial_seasons: 'true'  ## Sets whether users can request partial seasons.
+doplarr_sonarr_season_folders: 'true'  ## Sets whether you're using season folders in Sonarr

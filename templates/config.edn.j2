@@ -1,0 +1,20 @@
+{
+{% if doplarr_radarr_is_enabled %}
+ :radarr/url "{{ doplarr_radarr_host }}"
+ :radarr/api "{{ doplarr_radarr_api }}"
+ :radarr/quality-profile {{ doplarr_radarr_quality_profile }}
+ :radarr/rootfolder '{{ doplarr_radarr_root_folder }}
+{% endif %}
+{% if doplarr_sonarr_is_enabled %}
+ :sonarr/url "{{ doplarr_sonarr_host }}"
+ :sonarr/api "{{ doplarr_sonarr_api }}"
+ :sonarr/quality-profile "{{ doplarr_sonarr_quality_profile }}"
+ :sonarr/rootfolder "{{ doplarr_sonarr_root_folder }}"
+ :sonarr/season-folders {{ doplarr_sonarr_season_folders }}
+ :partial-seasons {{ doplarr_sonarr_partial_seasons }}
+{% endif %}
+ :discord/token "{{ doplarr_discord_token }}"
+ :discord/max-results {{ doplarr_discord_max_results }}
+ :discord/requested-msg-style {{ doplarr_discord_message_style }}
+ :log-level {{ doplarr_log_level }}
+ }

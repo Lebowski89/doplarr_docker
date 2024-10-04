@@ -1,0 +1,155 @@
+---
+
+################################
+# CHECK
+################################
+
+- name: Doplarr builtin fail
+  when: not doplarr_is_enabled
+  ansible.builtin.fail:
+    msg: 'Doplarr role is being run but one or multiple doplarr variables are empty. Check the defaults folder.'
+
+################################
+# DEPENDENCIES
+################################
+
+- name: Install prerequisite apt packages
+  ansible.builtin.apt:
+    pkg:
+      - python3-requests
+      - python3-lxml
+    update_cache: true
+
+- name: Install collection requirements
+  community.general.ansible_galaxy_install:
+    type: collection
+    requirements_file: '{{ role_path }}/requirements.yml'
+
+################################
+# DOCKER
+################################
+
+- name: Apt install docker if required
+  when: ansible_os_family == 'Debian'
+  block:
+    - name: Gather apt facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Include docker install tasks
+      when: '"docker-ce" not in ansible_facts.packages'
+      ansible.builtin.include_tasks: 'sub_tasks/docker.yml'
+
+################################
+# CLEAN UP
+################################
+
+- name: Register doplarr container
+  community.docker.docker_container_info:
+    name: '{{ doplarr_basics_name }}'
+  register: doplarr_existing_container_result
+
+- name: Remove existing doplarr container
+  when: doplarr_existing_container_result.exists
+  community.docker.docker_container:
+    container_default_behavior: compatibility
+    name: '{{ doplarr_basics_name }}'
+    state: absent
+    stop_timeout: 10
+  register: remove_doplarr_docker
+  retries: 5
+  delay: 10
+  until: remove_doplarr_docker is succeeded
+
+################################
+# BACKEND NETWORK
+################################
+
+- name: Conduct backend network tasks
+  when: doplarr_network_backend_is_enabled
+  block:
+    - name: Register doplarr backend network
+      community.docker.docker_network_info:
+        name: '{{ doplarr_network_backend }}'
+      register: doplarr_net_backend_result
+
+    - name: Doplarr network backend builtin fail
+      ansible.builtin.fail:
+        msg: Doplarr backend network does not exist nor is it enabled. Ensure the doplarr backend network variables contain valid entries.
+      when:
+        - not doplarr_net_backend_result.exists
+        - not doplarr_network_backend_is_enabled
+
+    - name: Create doplarr backend network
+      when:
+        - not doplarr_net_backend_result.exists
+        - doplarr_network_backend_is_enabled
+      community.docker.docker_network:
+        name: '{{ doplarr_network_backend }}'
+        driver: '{{ doplarr_network_backend_driver }}'
+        ipam_config:
+          - subnet: '{{ doplarr_network_backend_subnet }}'
+
+################################
+# APPDATA
+################################
+
+- name: Create doplarr appdata directory
+  ansible.builtin.file:
+    path: '{{ doplarr_paths_location }}'
+    state: directory
+    owner: '{{ doplarr_env_puid }}'
+    group: '{{ doplarr_env_pgid }}'
+    mode: '0755'
+
+################################
+# CONFIG
+################################
+
+- name: Check if doplarr config.edn exists
+  ansible.builtin.stat:
+    path: '{{ doplarr_paths_location }}/config.edn'
+  register: doplarr_config_edn
+
+- name: Fail when discord token not provided
+  when:
+    - not doplarr_config_edn.stat.exists
+    - (doplarr_discord_token == 'ENTER_DISCORD_TOKEN_HERE')
+  ansible.builtin.fail:
+    msg: 'Doplarr requires a Discord token to function. Provide a valid token for the doplarr_discord_token variable.'
+
+- name: Create doplarr config.edn file
+  when: not doplarr_config_edn.stat.exists
+  block:
+    - name: Import config file
+      ansible.builtin.template:
+        src: '{{ role_path }}/templates/config.edn.j2'
+        dest: '{{ doplarr_paths_location }}/config.edn'
+        force: true
+        owner: '{{ doplarr_env_puid }}'
+        group: '{{ doplarr_env_pgid }}'
+        mode: '0664'
+
+    - name: Wait for 'config.edn' to be created
+      ansible.builtin.wait_for:
+        path: '{{ doplarr_paths_location }}/config.edn'
+        state: present
+
+################################
+# CONTAINER
+################################
+
+- name: Create Doplarr container
+  community.docker.docker_container:
+    name: '{{ doplarr_basics_name }}'
+    image: '{{ doplarr_basics_image_repo }}:{{ doplarr_basics_image_tag }}'
+    networks:
+      - name: '{{ doplarr_network_backend }}'
+    env:
+      PUID: '{{ doplarr_env_puid }}'
+      PGID: '{{ doplarr_env_pgid }}'
+      TZ: '{{ doplarr_env_timezone }}'
+      CONFIG: '/config/config.edn'
+    volumes: '{{ doplarr_bind_mount }}'
+    restart_policy: '{{ doplarr_basics_restart_policy }}'
+

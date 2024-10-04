@@ -1,0 +1,51 @@
+---
+
+################################
+# BASICS
+################################
+
+doplarr_is_enabled: '{{ (doplarr_env_timezone is defined) and
+                        (doplarr_env_timezone is not none) and
+                        (doplarr_env_timezone | trim | length > 0) and
+                        (doplarr_env_puid is defined) and
+                        (doplarr_env_puid is not none) and
+                        (doplarr_env_puid | trim | length > 0) and
+                        (doplarr_env_pgid is defined) and
+                        (doplarr_env_pgid is not none) and
+                        (doplarr_env_pgid | trim | length > 0) }}'
+
+################################
+# NETWORK
+################################
+
+doplarr_network_backend_is_enabled: '{{ (doplarr_network_backend_driver is defined) and
+                                        (doplarr_network_backend_driver is not none) and
+                                        (doplarr_network_backend_driver | trim | length > 0) and
+                                        (doplarr_network_backend_subnet is defined) and
+                                        (doplarr_network_backend_subnet is not none) and
+                                        (doplarr_network_backend_subnet | trim | length > 0) }}'
+
+################################
+# CLIENTS
+################################
+
+doplarr_radarr_is_enabled: '{{ (doplarr_radarr_api is defined) and
+                               (doplarr_radarr_api is not none) and
+                               (doplarr_radarr_api | trim | length > 0) and
+                               (doplarr_radarr_quality_profile is defined) and
+                               (doplarr_radarr_quality_profile is not none) and
+                               (doplarr_radarr_quality_profile | trim | length > 0) and
+                               (doplarr_radarr_root_folder is defined) and
+                               (doplarr_radarr_root_folder is not none) and
+                               (doplarr_radarr_root_folder | trim | length > 0) }}'
+
+doplarr_sonarr_is_enabled: '{{ (doplarr_sonarr_api is defined) and
+                               (doplarr_sonarr_api is not none) and
+                               (doplarr_sonarr_api | trim | length > 0) and
+                               (doplarr_sonarr_quality_profile is defined) and
+                               (doplarr_sonarr_quality_profile is not none) and
+                               (doplarr_sonarr_quality_profile | trim | length > 0) and
+                               (doplarr_sonarr_root_folder is defined) and
+                               (doplarr_sonarr_root_folder is not none) and
+                               (doplarr_sonarr_root_folder | trim | length > 0) }}'
+

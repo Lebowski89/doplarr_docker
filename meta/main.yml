@@ -1,0 +1,19 @@
+galaxy_info:
+  author: Lebowski89
+  description: Ansible role to automate the set-up of Doplarr (Docker) -  An *arr request bot for Discord
+
+  license: MIT
+
+  min_ansible_version: 2.1
+
+  platforms:
+    - name: Debian
+
+  galaxy_tags:
+    - doplarr
+    - docker
+    - discord
+    - requests
+    - radarr
+    - sonarr
+    - pvr
