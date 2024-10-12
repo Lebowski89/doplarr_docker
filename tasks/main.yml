@@ -1,15 +1,6 @@
 ---
 
 ################################
-# CHECK
-################################
-
-- name: Doplarr builtin fail
-  when: not doplarr_is_enabled
-  ansible.builtin.fail:
-    msg: 'Doplarr role is being run but one or multiple doplarr variables are empty. Check the defaults folder.'
-
-################################
 # DEPENDENCIES
 ################################
 
@@ -38,7 +29,7 @@
 
     - name: Include docker install tasks
       when: '"docker-ce" not in ansible_facts.packages'
-      ansible.builtin.include_tasks: 'sub_tasks/docker.yml'
+      ansible.builtin.include_tasks: sub_tasks/docker.yml
 
 ################################
 # CLEAN UP

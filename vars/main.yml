@@ -1,20 +1,6 @@
 ---
 
 ################################
-# BASICS
-################################
-
-doplarr_is_enabled: '{{ (doplarr_env_timezone is defined) and
-                        (doplarr_env_timezone is not none) and
-                        (doplarr_env_timezone | trim | length > 0) and
-                        (doplarr_env_puid is defined) and
-                        (doplarr_env_puid is not none) and
-                        (doplarr_env_puid | trim | length > 0) and
-                        (doplarr_env_pgid is defined) and
-                        (doplarr_env_pgid is not none) and
-                        (doplarr_env_pgid | trim | length > 0) }}'
-
-################################
 # NETWORK
 ################################
 
